@@ -68,6 +68,7 @@ def get_ship_ID_Properties ():
               or int(row.attributeID) == 602
               or int(row.attributeID) == 644
               or int(row.attributeID) == 103
+              or int(row.attributeID) == 1326
               or int(row.attributeID) == 1371):
             ship_ID_EquipmentCharges.append(int(row.typeID))
 
@@ -75,7 +76,7 @@ def get_ship_ID_Properties ():
                  169 agility modifier istabs
                 150 hull hp mod (for bulkheads and expanded cargo holds)
                 1076 speed for overdrive
-                """ """29003 hic scram script"""
+                1326 speed penalty hic script"""
         elif (int(row.attributeID) == 50
               or int(row.attributeID) == 150
               or int(row.attributeID) == 1076
@@ -169,6 +170,7 @@ def input_evaluation_set (killmails, ship_ID_properties):
     """Load a dictionary of all relevant static properties indexed by shipID"""
     fitting_superset = []
     label_set = [0]
+    ship_subset = [[0,0,0]]
     fitting_superset = numpy.pad (fitting_superset,(0,ship_ID_properties["TotalSlotsMax"]), 'constant', constant_values = 0)  
     for killmail_counter in range(len(killmails["ShipID"])):
         
@@ -177,8 +179,8 @@ def input_evaluation_set (killmails, ship_ID_properties):
             continue
         ship_ID = killmails["ShipID"][killmail_counter]
         
-        """first three spots in the data are the static ship properties"""
-        ship_subset = [int(ship_ID), int(ship_ID_properties["PGOutput"][int(ship_ID)]), int(ship_ID_properties["CPUOutput"][int(ship_ID)])]
+        
+        
         fitting_subset = []
         
         """print(killmails["AllSlots"][killmail_counter])"""
@@ -186,14 +188,15 @@ def input_evaluation_set (killmails, ship_ID_properties):
         for item in killmails["AllSlots"][killmail_counter]:
             """Encode item by index in equipment list, all equipment IDs are now dense integers between 1 and the total number of equipment"""
             item = ship_ID_properties["EquipmentIDs"].index(int(item))
-            
+            ship_subset.append([int(ship_ID), ship_ID_properties["PGOutput"][int(ship_ID)] / 2000000.0, ship_ID_properties["CPUOutput"][int(ship_ID)] / 2000.0])
             label_set.append(int(item))
             fitting_subset.append(int(item_previous))
             fitting_subset_padded = numpy.pad (fitting_subset,(0,(ship_ID_properties["TotalSlotsMax"]- len(fitting_subset))), 'constant', constant_values = 0)
             """print(fitting_subset_padded , fitting_superset, len(fitting_subset_padded), len(fitting_superset))"""
             fitting_superset = numpy.vstack((fitting_superset , fitting_subset_padded))
             item_previous = item
-            
+    ship_subset = numpy.array(ship_subset)
+    label_set = numpy.array(label_set)
     training_set = ship_subset, fitting_superset[:] , label_set        
     return training_set
 
