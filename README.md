@@ -5,12 +5,9 @@ The two csvs contain static data about modules and ships in Eve, and the json fi
 
 ToDo:
 
-Improve training time by simplifying inputs slightly 
+Continue troubleshooting itemID parsing
 
 Write generative network and test, including a "itemID" to English function 
 
-Test the predictive network on an independent test set (a second batch of killmails) 
-
-Write batch importing of killmails (multiple JSON files)
 
 ...
