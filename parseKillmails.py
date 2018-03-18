@@ -132,7 +132,9 @@ def parse_Killmails (raw_killmail_PATH, ship_ID_properties):
         ship_med_slots = []
         ship_hi_slots = []
         ship_all_slots = []
-        ship_ID.append(kill["victim"]["shipTypeID"])
+        if (kill["victim"]["shipTypeID"] not in ship_ID_properties["PGOutput"]):
+            """print ("NON SHIP KILLMAIL", kill["victim"]["shipTypeID"])"""
+            continue
         """sort items by their slot, see invFlags for flag key"""
         for item in kill["items"]:
             
@@ -141,7 +143,10 @@ def parse_Killmails (raw_killmail_PATH, ship_ID_properties):
                 continue
             flag = int(item["flag"])
             """print (flag)"""
-            if (flag > 10 and flag < 19):
+            if (flag > 10 and flag < 35):
+                ship_all_slots.append(item["typeID"])
+                
+            """if (flag > 10 and flag < 19):
                 ship_low_slots.append(item["typeID"])
                 ship_all_slots.append(item["typeID"])
             else:
@@ -151,10 +156,18 @@ def parse_Killmails (raw_killmail_PATH, ship_ID_properties):
                 else:
                     if (flag > 26 and flag < 35):
                         ship_hi_slots.append(item["typeID"])
-                        ship_all_slots.append(item["typeID"])
-        killmails_hi_slots.append(ship_hi_slots)
+                        ship_all_slots.append(item["typeID"])"""
+        if (len(ship_all_slots) > ship_ID_properties["TotalSlotsMax"]):
+            print ("WARNING EXTRA MODULES, KILLMAIL TOO LARGE, REJECTED", ship_all_slots)
+            continue
+        if (len(ship_all_slots) == 0):
+            """print ("Empty Killmail")"""
+            continue
+        """killmails_hi_slots.append(ship_hi_slots)
         killmails_med_slots.append(ship_med_slots)
-        killmails_low_slots.append(ship_low_slots)
+        killmails_low_slots.append(ship_low_slots)"""
+
+        ship_ID.append(kill["victim"]["shipTypeID"])
         killmails_all_slots.append(ship_all_slots)
     killmails = {"ShipID":ship_ID , "AllSlots": killmails_all_slots,
                 "HiSlots": killmails_hi_slots, "MedSlots": killmails_med_slots,
@@ -174,9 +187,7 @@ def input_evaluation_set (killmails, ship_ID_properties):
     fitting_superset = numpy.pad (fitting_superset,(0,ship_ID_properties["TotalSlotsMax"]), 'constant', constant_values = 0)  
     for killmail_counter in range(len(killmails["ShipID"])):
         
-        """check to make sure there are any modules on the ship"""
-        if len(killmails["AllSlots"][killmail_counter]) == 0:
-            continue
+        
         ship_ID = killmails["ShipID"][killmail_counter]
         
         
