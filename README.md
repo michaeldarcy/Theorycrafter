@@ -9,5 +9,5 @@ Continue troubleshooting itemID parsing
 
 Write generative network and test, including a "itemID" to English function 
 
-
+Based on advice recieved from Daniel Canaday, rewrite loss function to permit any remaining module on ship equipment.
 ...
